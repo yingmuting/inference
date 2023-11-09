@@ -1,0 +1,35 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: eks-neuron-test
+  labels:
+    app: eks-neuron-test
+    role: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eks-neuron-test
+      role: master
+  template:
+    metadata:
+      labels:
+        app: eks-neuron-test
+        role: master
+    spec:
+      containers:
+        - name: eks-neuron-test
+          image: 952972464070.dkr.ecr.us-east-1.amazonaws.com/inf:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 4
+              memory: 4Gi
+              aws.amazon.com/neuron: 1
+            requests:
+              cpu: "4"
+              memory: 4Gi

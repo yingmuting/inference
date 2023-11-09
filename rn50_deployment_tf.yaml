@@ -1,0 +1,57 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: eks-neuron-test
+  namespace: kube-system
+  labels:
+    app: eks-neuron-test
+    role: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eks-neuron-test
+      role: master
+  template:
+    metadata:
+      labels:
+        app: eks-neuron-test
+        role: master
+    spec:
+      containers:
+        - name: eks-neuron-test
+          image: 763104351884.dkr.ecr.us-east-1.amazonaws.com/tensorflow-inference-neuron:1.15.4-neuron-py37-ubuntu18.04
+          command:
+            - /usr/local/bin/entrypoint.sh
+          args:
+            - --port=8500
+            - --rest_api_port=9000
+            - --model_name=resnet50_neuron
+            - --model_base_path=s3://<your-bucket-of-models>/resnet50_neuron/
+          ports:
+            - containerPort: 8500
+            - containerPort: 9000
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: AWS_REGION
+              value: "us-east-1"
+            - name: S3_USE_HTTPS
+              value: "1"
+            - name: S3_VERIFY_SSL
+              value: "0"
+            - name: S3_ENDPOINT
+              value: s3.us-east-1.amazonaws.com
+            - name: AWS_LOG_LEVEL
+              value: "3"
+          resources:
+            limits:
+              cpu: 4
+              memory: 4Gi
+              aws.amazon.com/neuron: 1
+            requests:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            capabilities:
+              add:
+                - IPC_LOCK

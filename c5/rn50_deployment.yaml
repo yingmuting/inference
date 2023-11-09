@@ -1,0 +1,36 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: eks-neuron-test-c5
+  labels:
+    app: eks-neuron-test-c5
+    role: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eks-neuron-test-c5
+      role: master
+  template:
+    metadata:
+      labels:
+        app: eks-neuron-test-c5
+        role: master
+    spec:
+      containers:
+        - name: eks-neuron-test-c5
+          image: 952972464070.dkr.ecr.us-east-1.amazonaws.com/infc5:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 6
+              memory: 12Gi
+            requests:
+              cpu: "6"
+              memory: 12Gi
+      nodeSelector:
+        alpha.eksctl.io/nodegroup-name: ng-c5

@@ -1,0 +1,100 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: eks-neuron-test
+  labels:
+    app: eks-neuron-test
+    role: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eks-neuron-test
+      role: master
+  template:
+    metadata:
+      labels:
+        app: eks-neuron-test
+        role: master
+    spec:
+      volumes:
+        - name: sock
+          emptyDir: { }
+        - name: neuron0
+          hostPath:
+            path: /dev/neuron0
+        - name: device-plugin
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+        - name: infa-map
+          hostPath:
+            path: /run
+      nodeSelector:
+        alpha.eksctl.io/nodegroup-name: ng-inf1
+      containers:
+        - name: neuron-rtd
+          image: 790709498068.dkr.ecr.us-west-2.amazonaws.com/neuron-rtd:1.0.6905.0
+          imagePullPolicy: Always
+          env:
+            - name: NEURONCORE_GROUP_SIZES
+              value: "4"
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh","-c","sleep 15"]
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - SYS_ADMIN
+                - IPC_LOCK
+          volumeMounts:
+            - name: sock
+              mountPath: /sock
+            - name: neuron0
+              mountPath: /dev/neuron0
+            - name: device-plugin
+              mountPath: /var/lib/kubelet/device-plugins
+            - name: infa-map
+              mountPath: /run
+          resources:
+            limits:
+              hugepages-2Mi: "256Mi"
+              aws.amazon.com/neuron: 1
+              cpu: "1"
+            requests:
+              aws.amazon.com/neuron: 1
+              cpu: "1"
+              memory: "4Gi"
+        - name: eks-neuron-test
+          image: 952972464070.dkr.ecr.us-east-1.amazonaws.com/inf:latest
+          imagePullPolicy: Always
+          env:
+            - name: NEURON_RTD_ADDRESS
+              value: unix:/sock/neuron.sock
+            - name: NEURONCORE_GROUP_SIZES
+              value: "4"
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          securityContext:
+            privileged: true
+          resources:
+            limits:
+              cpu: "6"
+              memory: "6Gi"
+            requests:
+              cpu: "6"
+              memory: "6Gi"
+          lifecycle:
+            postStart:
+              exec:
+                command: [ "/bin/sh","-c","nohup neuron-monitor -c /opt/aws/neuron/config/monitor.conf | neuron-monitor-cloudwatch.py --namespace neuron_monitor --region us-east-1  >/dev/null 2>&1 &" ]
+          volumeMounts:
+            - name: sock
+              mountPath: /sock
+            - name: device-plugin
+              mountPath: /var/lib/kubelet/device-plugins
+            - name: infa-map
+              mountPath: /run

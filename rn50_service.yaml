@@ -1,0 +1,50 @@
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: eks-neuron-test-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: eks-neuron-test
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: eks-neuron-test-clusterip
+  labels:
+    app: eks-neuron-test-clusterip
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-serving
+      port: 9000
+      targetPort: 8080
+  selector:
+    app: eks-neuron-test
+    role: master
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: eks-neuron-test-nodeport
+  labels:
+    app: eks-neuron-test-nodeport
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: eks-neuron-test
+    role: master

@@ -1,0 +1,16 @@
+com/example/inferentia/InferentiaDemo.java
+ com.example.inferentia.InferentiaDemo
+com/example/inferentia/Benchmark.java
+ com.example.inferentia.Benchmark
+ com.example.inferentia.Benchmark$1
+ com.example.inferentia.Benchmark$PredictorCallable
+com/example/inferentia/InferredObject.java
+ com.example.inferentia.InferredObject
+com/example/inferentia/DjlSpringBootApplication.java
+ com.example.inferentia.DjlSpringBootApplication
+com/example/inferentia/InferenceResponse.java
+ com.example.inferentia.InferenceResponse
+com/example/inferentia/InferencePointController.java
+ com.example.inferentia.InferencePointController
+com/example/inferentia/config/InferenceConfiguration.java
+ com.example.inferentia.config.InferenceConfiguration

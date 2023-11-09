@@ -1,0 +1,26 @@
+{
+   "model_params_default" : {
+      "ninfer" : 4,
+      "io_dma_data_host" : true,
+      "io_dma_ring_host" : false,
+      "timeout" : 2,
+      "validate_nn_package_hash": true,
+      "enable_node_profiling": false
+   },
+   "init_config" : {
+       "shmem_enabled": true,
+       "num_hugepages_per_device": 128,
+       "share_tdram" : false,
+       "pooling_thread_cpu_affinity_start": -1,
+       "streaming_thread_cpu_affinity_start": -1,
+       "streaming_thread_cpu_affinity_count": -1,
+       "worker_thread_cpu_affinity_start": -1,
+       "pooling_thread_sleep_interval": 1,
+       "model_cache_count": 0,
+       "debug": false,
+       "allow_metric" : true,
+       "metric_send_interval_secs": 30
+   },
+   "nc_init_config" : {
+   }
+}

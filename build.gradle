@@ -1,0 +1,55 @@
+plugins {
+    id "java"
+    id "application"
+    id "org.springframework.boot" version "2.5.3"
+}
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
+
+dependencies {
+    implementation platform("ai.djl:bom:0.12.0")
+    implementation "ai.djl:api"
+    implementation "ai.djl.aws:aws-ai:0.12.0"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-log4j2"
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.15")
+
+    runtimeOnly "ai.djl.pytorch:pytorch-engine"
+    runtimeOnly "ai.djl.pytorch:pytorch-native-cpu-precxx11::linux-x86_64"
+    runtimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:2.13.3"
+}
+
+configurations {
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+}
+
+configure(this) {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    apply from: file("${rootProject.projectDir}/tools/gradle/formatter.gradle")
+}
+
+//application {
+//    getMainClass().set(System.getProperty("main", "com.example.inferentia.InferentiaDemo"))
+//}
+
+task benchmark(type: JavaExec) {
+    systemProperties System.getProperties()
+    systemProperties.remove("user.dir")
+    systemProperty("file.encoding", "UTF-8")
+    classpath = sourceSets.main.runtimeClasspath
+    main = "com.example.inferentia.Benchmark"
+}
+tasks.distTar.enabled = false

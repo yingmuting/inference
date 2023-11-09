@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: eks-neuron-test-c5-clusterip
+  labels:
+    app: eks-neuron-test-c5-clusterip
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-serving
+      port: 9001
+      targetPort: 8080
+  selector:
+    app: eks-neuron-test-c5
+    role: master
